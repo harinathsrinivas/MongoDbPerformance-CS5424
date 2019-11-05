@@ -1,16 +1,18 @@
 package assign2;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.Decimal128;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.ReadConcern;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoIterable;
 import com.mongodb.client.result.UpdateResult;
 
 import static com.mongodb.client.model.Filters.*;
@@ -49,7 +51,7 @@ public class Delivery extends Transaction {
 		}
 	}
 
-	private Document getOrder(int w_id, int d_id) {
+	private Document getOrder(int w_id, int d_id) {		
 		Document doc = getCollection("order")
 				.find(and(eq("O_W_ID", w_id), eq("O_D_ID", d_id), eq("O_CARRIER_ID", -1)))
 				.projection(fields(include("O_ID", "O_C_ID"), excludeId()))
@@ -60,14 +62,12 @@ public class Delivery extends Transaction {
 	}
 
 	private BigDecimal getTotalAmount(int w_id, int d_id, int o_id) {
-		MongoIterable<Document> cursor = getCollection("orderline")
-				.find(and(eq("OL_W_ID", w_id), eq("OL_D_ID", d_id), eq("OL_O_ID", o_id)))
-		        .projection(fields(include("OL_AMOUNT"), excludeId()));
-		BigDecimal amount = new BigDecimal("0.00");
-		for (Document doc: cursor) {
-			amount = amount.add(doc.get("OL_AMOUNT", Decimal128.class).bigDecimalValue());
-		}
-		return amount;
+		List<Bson> query = new ArrayList<Bson>();
+		query.add(new BasicDBObject("$match", and(eq("OL_W_ID", w_id), eq("OL_D_ID", d_id), eq("OL_O_ID", o_id))));
+		BasicDBObject sums = new BasicDBObject("_id", "").append("TOTAL_OL_AMOUNT", new BasicDBObject("$sum", "$OL_AMOUNT"));
+		query.add(new BasicDBObject("$group", sums));
+		Document doc = getCollection("orderline").aggregate(query).first();
+		return doc.get("TOTAL_OL_AMOUNT", Decimal128.class).bigDecimalValue();
 	}
 
 	private UpdateResult updateOrder(int w_id, int d_id, int o_id, int o_carrier_id) {

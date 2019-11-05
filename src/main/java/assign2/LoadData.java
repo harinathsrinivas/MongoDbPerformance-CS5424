@@ -17,10 +17,12 @@ import ch.qos.logback.classic.LoggerContext;
 
 public class LoadData {
 	private static final String DATABASE = "wholesale";
-	//private static final String DEFAULT_MONGOIMPORT_PATH = "/usr/local/bin/mongoimport";
 	private static final String DEFAULT_MONGOIMPORT_PATH = "/temp/MongoDb/mongo/mongos/mongodb-linux-x86_64-rhel70-4.2.1/bin/mongoimport";
 	private static final String DEFAULT_DATA_PATH = "project-files/data-files/";
 	private static final String HOST = "192.168.56.159";
+	
+	//private static final String DEFAULT_MONGOIMPORT_PATH = "/usr/local/bin/mongoimport";
+	//private static final String HOST = "localhost";
 	
 	private String mongoimportPath;
 	private String dataPath;
@@ -87,6 +89,7 @@ public class LoadData {
 								"C_DISCOUNT.decimal()", "C_BALANCE.decimal()", "C_YTD_PAYMENT.double()", "C_PAYMENT_CNT.int32()",
 								"C_DELIVERY_CNT.int32()", "C_DATA.string()"};
 		db.getCollection(name).createIndex(Indexes.ascending("C_W_ID", "C_D_ID", "C_ID"), new IndexOptions().unique(true));
+		db.getCollection(name).createIndex(Indexes.descending("C_BALANCE"));
 		loadFromCsv(name, columnNames);
 	}
     
@@ -95,6 +98,7 @@ public class LoadData {
 		String[] columnNames = {"O_W_ID.int32()", "O_D_ID.int32()", "O_ID.int32()", "O_C_ID.int32()", "O_CARRIER_ID.int32()", 
 								"O_OL_CNT.int32()", "O_ALL_LOCAL.boolean()", "O_ENTRY_D.date(2006-01-02 15:04:05.999)"};
 		db.getCollection(name).createIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_ID"), new IndexOptions().unique(true));
+		db.getCollection(name).createIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_CARRIER_ID"));
 		//db.getCollection(name).createIndex(Indexes.compoundIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_C_ID"), Indexes.descending("O_ID")));
 		loadFromCsv(name, columnNames, "-1");
 	}

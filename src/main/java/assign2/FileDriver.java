@@ -134,6 +134,6 @@ public class FileDriver {
 		System.err.println(String.format("Average Transcation Latency: %f ms", average));
 		System.err.println(String.format("Median Transcation Latency: %f ms", median));
 		System.err.println(String.format("95 Percentile Transcation Latency: %f ms", percentile95));
-		System.err.println(String.format("98 Percentile Transcation Latency: %f ms", percentile99));
+		System.err.println(String.format("99 Percentile Transcation Latency: %f ms", percentile99));
 	}
 }

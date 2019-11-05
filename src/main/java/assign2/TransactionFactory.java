@@ -1,17 +1,22 @@
 package assign2;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mongodb.ReadConcern;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+
 public class TransactionFactory {
 	
 	public static void main(String[] args) {
-		Logger.getLogger("org.mongodb.driver").setLevel(Level.SEVERE);
+		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+		Logger rootLogger = loggerContext.getLogger("org.mongodb.driver");
+		rootLogger.setLevel(Level.OFF);
 
 		MongoClient client = MongoClients.create();
 		TransactionFactory factory = new TransactionFactory("wholesale", client, ReadConcern.LOCAL, WriteConcern.W1);
