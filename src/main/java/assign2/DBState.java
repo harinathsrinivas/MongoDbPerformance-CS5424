@@ -25,7 +25,8 @@ public class DBState {
 		Logger rootLogger = loggerContext.getLogger("org.mongodb.driver");
 		rootLogger.setLevel(Level.OFF);
 
-		MongoClient client = MongoClients.create();
+		String connectionString = args[0];
+		MongoClient client = MongoClients.create(connectionString);
 		DBState state = new DBState(client);
 		
 		state.getWarehouseSummary();

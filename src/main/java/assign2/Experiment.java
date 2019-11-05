@@ -232,7 +232,7 @@ class DBStateThread extends Thread {
 			System.out.println("Finished");
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("Unable to start FileDriver");
+			System.out.println("Unable to start DBState");
 			System.exit(0);
 		}
 	}
