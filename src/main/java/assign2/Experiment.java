@@ -22,10 +22,11 @@ public class Experiment {
 		int nClients = Integer.parseInt(args[0]);
 		String readConcern = args[1];
 		String writeConcern = args[2];
+		boolean reloadData = args.length == 3;
 		String xactFileDir = "project-files/xact-files";
 		String outputDir = String.format("experiment__nc_%d__r_%s__w_%s", 
 				nClients, readConcern, writeConcern);
-		Experiment exp = new Experiment(xactFileDir, outputDir, nClients, readConcern, writeConcern);
+		Experiment exp = new Experiment(xactFileDir, outputDir, nClients, readConcern, writeConcern, reloadData);
 		exp.run();
 	}
 	
@@ -36,9 +37,11 @@ public class Experiment {
 	private int nClients;
 	private String readConcern;
 	private String writeConcern;
+	boolean reloadData;
 	
 	public Experiment(String xactFileDir, String outputDir, 
-			int nClients, String readConcern, String writeConcern) {
+			int nClients, String readConcern, String writeConcern,
+			boolean reloadData) {
 		this.xactFileDir = xactFileDir;
 		this.outputDir = outputDir;
 		this.sysoutDir = outputDir + System.getProperty("file.separator") + SYSOUT_FOLDER;
@@ -46,18 +49,21 @@ public class Experiment {
 		this.nClients = nClients;
 		this.readConcern = readConcern;
 		this.writeConcern = writeConcern;
+		this.reloadData = reloadData;
 	}
 
 	public void run() {
 		makeFolders();
-		LoadDataThread loadData = new LoadDataThread();
-		loadData.start();
-		try {
-			loadData.join();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-			System.out.println("LoadData failed.");
-			System.exit(0);
+		if (reloadData) {
+			LoadDataThread loadData = new LoadDataThread();
+			loadData.start();
+			try {
+				loadData.join();
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+				System.out.println("LoadData failed.");
+				System.exit(0);
+			}
 		}
 		List<Thread> threads = new ArrayList<Thread>();
 		List<String> reportPaths = new ArrayList<String>();
