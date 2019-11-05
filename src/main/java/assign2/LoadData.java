@@ -1,0 +1,168 @@
+package assign2;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+import org.slf4j.LoggerFactory;
+
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+
+public class LoadData {
+	private static final String DATABASE = "wholesale";
+	private static final String DEFAULT_MONGOIMPORT_PATH = "/usr/local/bin/mongoimport";
+	private static final String DEFAULT_DATA_PATH = "project-files/data-files/";
+	
+	private String mongoimportPath;
+	private String dataPath;
+	private MongoClient client;
+	private MongoDatabase db;
+
+	public static void main(String[] args) {
+		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+		Logger rootLogger = loggerContext.getLogger("org.mongodb.driver");
+		rootLogger.setLevel(Level.OFF);
+
+		LoadData loader = new LoadData(DEFAULT_MONGOIMPORT_PATH, DEFAULT_DATA_PATH);
+		loader.start();
+		loader.getDatabase().drop();
+		loader.loadWarehouseData();
+		loader.loadDistrictData();
+		loader.loadCustomerData();
+		loader.loadOrderData();
+		loader.loadItemData();
+		loader.loadOrderLineData();
+		loader.loadStockData();
+		loader.close();
+	}
+	
+	public LoadData(String mongoimportPath, String dataPath) {
+		this.mongoimportPath = mongoimportPath;
+		this.dataPath = dataPath;
+	}
+	
+	public void start() {
+		client = MongoClients.create();
+		db = client.getDatabase(DATABASE);
+	}
+	
+	public void close() {
+		client.close();
+	}
+	
+	public MongoDatabase getDatabase() {
+		return db;
+	}
+
+	public void loadWarehouseData() {
+		String name = "warehouse";
+		String[] columnNames = {"W_ID.int32()", "W_NAME.string()", "W_STREET_1.string()", "W_STREET_2.string()", "W_CITY.string()", 
+				                "W_STATE.string()", "W_ZIP.string()", "W_TAX.decimal()", "W_YTD.decimal()"};
+		db.getCollection(name).createIndex(Indexes.ascending("W_ID"), new IndexOptions().unique(true));
+		loadFromCsv(name, columnNames);
+	}
+	
+	public void loadDistrictData() {
+		String name = "district";
+		String[] columnNames = {"D_W_ID.int32()", "D_ID.int32()", "D_NAME.string()", "D_STREET_1.string()", "D_STREET_2.string()", 
+								"D_CITY.string()", "D_STATE.string()", "D_ZIP.string()", "D_TAX.decimal()", "D_YTD.decimal()", "D_NEXT_O_ID.int32()"};
+		db.getCollection(name).createIndex(Indexes.ascending("D_W_ID", "D_ID"), new IndexOptions().unique(true));
+		loadFromCsv(name, columnNames);
+	}
+	
+	public void loadCustomerData() {
+		String name = "customer";
+		String[] columnNames = {"C_W_ID.int32()", "C_D_ID.int32()", "C_ID.int32()", "C_FIRST.string()", "C_MIDDLE.string()", 
+								"C_LAST.string()", "C_STREET_1.string()", "C_STREET_2.string()", "C_CITY.string()", "C_STATE.string()", 
+								"C_ZIP.string()", "C_PHONE.string()", "C_SINCE.date(2006-01-02 15:04:05.999)", "C_CREDIT.string()", "C_CREDIT_LIM.decimal()",
+								"C_DISCOUNT.decimal()", "C_BALANCE.decimal()", "C_YTD_PAYMENT.double()", "C_PAYMENT_CNT.int32()",
+								"C_DELIVERY_CNT.int32()", "C_DATA.string()"};
+		db.getCollection(name).createIndex(Indexes.ascending("C_W_ID", "C_D_ID", "C_ID"), new IndexOptions().unique(true));
+		loadFromCsv(name, columnNames);
+	}
+    
+	public void loadOrderData() {
+		String name = "order";
+		String[] columnNames = {"O_W_ID.int32()", "O_D_ID.int32()", "O_ID.int32()", "O_C_ID.int32()", "O_CARRIER_ID.int32()", 
+								"O_OL_CNT.int32()", "O_ALL_LOCAL.boolean()", "O_ENTRY_D.date(2006-01-02 15:04:05.999)"};
+		db.getCollection(name).createIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_ID"), new IndexOptions().unique(true));
+		//db.getCollection(name).createIndex(Indexes.compoundIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_C_ID"), Indexes.descending("O_ID")));
+		loadFromCsv(name, columnNames, "-1");
+	}
+	
+	public void loadItemData() {
+		String name = "item";
+		String[] columnNames = {"I_ID.int32()", "I_NAME.string()", "I_PRICE.decimal()", "I_IM_ID.int32()", "I_DATA.string()"};
+		db.getCollection(name).createIndex(Indexes.ascending("I_ID"), new IndexOptions().unique(true));
+		loadFromCsv(name, columnNames);
+	}
+    
+	public void loadOrderLineData() {
+		String name = "order-line";
+		String[] columnNames = {"OL_W_ID.int32()", "OL_D_ID.int32()", "OL_O_ID.int32()", "OL_NUMBER.int32()", "OL_I_ID.int32()", 
+								"OL_DELIVERY_D.date(2006-01-02 15:04:05.999)", "OL_AMOUNT.decimal()", "OL_SUPPLY_W_ID.int32()", "OL_QUANTITY.decimal()",
+								"OL_DIST_INFO.string()"};
+		db.getCollection(name.replace("-", "")).createIndex(Indexes.ascending("OL_W_ID", "OL_D_ID", "OL_O_ID", "OL_NUMBER"), new IndexOptions().unique(true));
+		db.getCollection(name.replace("-", "")).createIndex(Indexes.ascending("OL_W_ID", "OL_I_ID"));
+		loadFromCsv(name, columnNames, "");
+	}
+
+	public void loadStockData() {
+		String name = "stock";
+		String[] columnNames = {"S_W_ID.int32()", "S_I_ID.int32()", "S_QUANTITY.decimal()", "S_YTD.decimal()", "S_ORDER_CNT.int32()", 
+								"S_REMOTE_CNT.int32()", "S_DIST_01.string()", "S_DIST_02.string()", "S_DIST_03.string()",
+								"S_DIST_04.string()", "S_DIST_05.string()", "S_DIST_06.string()", "S_DIST_07.string()",
+								"S_DIST_08.string()", "S_DIST_09.string()", "S_DIST_10.string()", "S_DATA.string()"};
+		db.getCollection(name).createIndex(Indexes.ascending("S_W_ID", "S_I_ID"), new IndexOptions().unique(true));
+		loadFromCsv(name, columnNames);
+	}
+
+	private void loadFromCsv(String collectionName, String[] fieldNames) {
+		String filepath = dataPath + collectionName + ".csv";
+		String fields = "\"" + String.join(",", fieldNames) + "\"";
+		String[] cmd = {mongoimportPath, 
+				        "-d", DATABASE, 
+				        "-c", collectionName.replace("-", ""), 
+				        "--type", "csv", 
+				        "--file", filepath,
+				        "--fields", fields,
+				        "--columnsHaveTypes"};
+		executeCmd(cmd);
+	}
+	
+	private void loadFromCsv(String collectionName, String[] fieldNames, String replaceNull) {
+		String filepath = dataPath + collectionName + ".csv";
+		String sedCmd = "sed s/,null,/," + replaceNull + ",/ " + filepath;
+		String fields = "\"" + String.join(",", fieldNames) + "\"";
+		String[] importCmd = {mongoimportPath, 
+					          "-d", DATABASE, 
+					          "-c", collectionName.replace("-", ""), 
+					          "--type", "csv", 
+					          "--fields", fields,
+					          "--columnsHaveTypes",
+					          "--ignoreBlanks"};
+		String[] cmd = {"/bin/sh", "-c", sedCmd + " | " + String.join(" ", importCmd)};
+		executeCmd(cmd);
+	}
+	
+	private void executeCmd(String[] cmd) {
+		try {
+			Process p = Runtime.getRuntime().exec(cmd);
+			BufferedReader stderr = new BufferedReader(new InputStreamReader(p.getErrorStream())); 
+			String s = ""; 
+			while ((s = stderr.readLine()) != null) { 
+			     System.out.println(s); 
+			} 
+		}
+		catch (Exception e) { 
+			e.printStackTrace();
+		} 
+	}
+}
