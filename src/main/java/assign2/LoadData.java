@@ -51,7 +51,7 @@ public class LoadData {
 	}
 	
 	public void start() {
-		client = MongoClients.create();
+		client = MongoClients.create("mongodb://" + HOST);
 		db = client.getDatabase(DATABASE);
 	}
 	
