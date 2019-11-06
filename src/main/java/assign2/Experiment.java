@@ -19,6 +19,7 @@ public class Experiment {
 			"mongodb://192.168.56.163"};
 	
 	public static void main(String[] args) {
+		System.out.println("Starting Experiment");
 		int nClients;
 		boolean test;
 		try {
