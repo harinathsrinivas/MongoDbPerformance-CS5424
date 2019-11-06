@@ -23,7 +23,7 @@ public class LoadData {
 	private static final String DEFAULT_MONGOIMPORT_PATH = "/temp/MongoDb/mongo/mongos/mongodb-linux-x86_64-rhel70-4.2.1/bin/mongoimport";
 	private static final String DEFAULT_DATA_PATH = "project-files/data-files/";
 	private static final String HOST = "192.168.56.159";
-	private static final String NUM_WORKERS = "16";
+	private static final String NUM_WORKERS = "24";
 
 	
 	//private static final String DEFAULT_MONGOIMPORT_PATH = "/usr/local/bin/mongoimport";
@@ -111,7 +111,7 @@ public class LoadData {
 								"O_OL_CNT.int32()", "O_ALL_LOCAL.boolean()", "O_ENTRY_D.date(2006-01-02 15:04:05.999)"};
 		String[] keys = {"O_W_ID", "O_D_ID", "O_ID"};
 		db.getCollection(name).createIndex(Indexes.ascending(keys), new IndexOptions().unique(true));
-		db.getCollection(name).createIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_CARRIER_ID"));
+		//db.getCollection(name).createIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_CARRIER_ID"));
 		//db.getCollection(name).createIndex(Indexes.compoundIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_C_ID"), Indexes.descending("O_ID")));
 		setShardKey(name, keys);
 		loadFromCsv(name, columnNames, "-1");
@@ -133,7 +133,7 @@ public class LoadData {
 								"OL_DIST_INFO.string()"};
 		String[] keys = {"OL_W_ID", "OL_D_ID", "OL_O_ID", "OL_NUMBER"};
 		db.getCollection(name).createIndex(Indexes.ascending(keys), new IndexOptions().unique(true));
-		db.getCollection(name).createIndex(Indexes.ascending("OL_W_ID", "OL_I_ID"));
+		//db.getCollection(name).createIndex(Indexes.ascending("OL_W_ID", "OL_I_ID"));
 		setShardKey(name, keys);
 		loadFromCsv("order-line", columnNames, "");
 	}
@@ -210,9 +210,8 @@ public class LoadData {
 			for (String field : fields) {
 				keys = keys.append(field, 1);
 			}
-			keys = new BasicDBObject("_id", "hashed");
 			BasicDBObject cmd = new BasicDBObject("shardCollection", DATABASE + "." + collection).
-					  append("key", keys);
+					  append("key", keys).append("unique", true);
 			Document result = client.getDatabase("admin").runCommand((Bson) cmd);
 			System.out.println(result.toJson());
 		} catch (Exception e) {
