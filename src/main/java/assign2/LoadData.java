@@ -192,7 +192,7 @@ public class LoadData {
 		try {
 			BasicDBObject keys = new BasicDBObject();
 			for (String field : fields) {
-				keys = keys.append(field, new BasicDBObject(field, 1));
+				keys = keys.append(field, 1);
 			}
 			BasicDBObject cmd = new BasicDBObject("shardCollection", DATABASE + "." + collection).
 					  append("key", keys);
