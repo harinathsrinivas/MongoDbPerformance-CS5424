@@ -40,6 +40,7 @@ public class LoadData {
 		LoadData loader = new LoadData(DEFAULT_MONGOIMPORT_PATH, DEFAULT_DATA_PATH);
 		loader.start();
 		loader.getDatabase().drop();
+		loader.enableSharding();
 		loader.loadWarehouseData();
 		loader.loadDistrictData();
 		loader.loadCustomerData();
@@ -200,5 +201,14 @@ public class LoadData {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void enableSharding() {
+		try {
+			Document result = client.getDatabase("admin").runCommand(new BasicDBObject("enableSharding", DATABASE));
+			System.out.println(result.toJson());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
 	}
 }
