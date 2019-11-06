@@ -2,9 +2,16 @@ package assign2;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Experiment {
 	private static final String SYSOUT_FOLDER = "xact-output";
@@ -19,7 +26,6 @@ public class Experiment {
 			"mongodb://192.168.56.163"};
 	
 	public static void main(String[] args) {
-		System.out.println("Starting Experiment");
 		int nClients;
 		boolean test;
 		try {
@@ -62,6 +68,7 @@ public class Experiment {
 	}
 
 	public void run() {
+		System.out.println("Starting Experiment " + outputDir);
 		makeFolders();
 		if (reloadData) {
 			LoadDataThread loadData = new LoadDataThread();
@@ -106,6 +113,26 @@ public class Experiment {
 			System.out.println("DBState failed.");
 			System.exit(0);
 		}
+		
+		String throughputPath = reportDir + System.getProperty("file.separator") + THROUGHPUT_REPORT_FILE;
+		List<Double> throughputs = new ArrayList<Double>();
+		for (String path : reportPaths) {
+			throughputs.add(getThroughput(path));
+		}
+		DoubleSummaryStatistics statistics = throughputs.stream().collect(Collectors.summarizingDouble(Double::doubleValue));
+		try {
+			FileWriter  fileWriter = new FileWriter(throughputPath);
+		    PrintWriter printWriter = new PrintWriter(fileWriter);
+		    printWriter.printf("Min Throughput: %f txns/sec %n", statistics.getMin());
+		    printWriter.printf("Avg Throughput: %f txns/sec %n", statistics.getAverage());
+		    printWriter.printf("Max Throughput: %f txns/sec %n", statistics.getMax());
+		    printWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Write Throughput failed.");
+			System.exit(0);
+		}
+
 	}
 	
 	private void makeFolders() {
@@ -138,6 +165,27 @@ public class Experiment {
 				System.out.println("Unexpected error.");
 				System.exit(0);
 			}
+		}
+	}
+	
+	private double getThroughput(String filepath) {
+		try {
+			Scanner sc = new Scanner(new File(filepath));
+			double throughput = 0;
+	        while (sc.hasNext()) {
+	            String[] parts = sc.nextLine().split(" ");
+	            if (parts[0].equals("Throughput:")) {
+	            	throughput = Double.parseDouble(parts[1]);
+	            	break;
+	            }
+	        }
+			sc.close();
+			if (throughput == 0) {
+				throw new Error("No throughput in " + filepath);
+			}
+			return throughput;
+		} catch (FileNotFoundException e) {
+			throw new Error("File not found: " + filepath);
 		}
 	}
 }
