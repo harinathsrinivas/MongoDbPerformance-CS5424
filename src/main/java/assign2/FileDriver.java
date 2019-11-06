@@ -18,7 +18,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
 public class FileDriver {
-	private static final String database = "wholesale2";
+	private static final String DATABASE = LoadData.DATABASE;
 
 	public static void main(String[] args) {
 		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -89,7 +89,7 @@ public class FileDriver {
 
 	private List<Long> processTransactions(Scanner sc) {
 		MongoClient client = MongoClients.create(connectionString);
-        TransactionFactory factory = new TransactionFactory(database, client, readConcern, writeConcern);
+        TransactionFactory factory = new TransactionFactory(DATABASE, client, readConcern, writeConcern);
         List<Long> transactionTimes = new ArrayList<Long>();
         while (sc.hasNext()) {
         	long startTime = System.currentTimeMillis();

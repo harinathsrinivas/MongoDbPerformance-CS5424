@@ -18,7 +18,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 
 public class DBState {
-	private static final String database = "wholesale";
+	private static final String DATABASE = LoadData.DATABASE;
 
 	public static void main(String[] args) {
 		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -77,7 +77,7 @@ public class DBState {
 	}
 	
 	private MongoCollection<Document> getCollection(String collectionName) {
-		return client.getDatabase(database).withReadConcern(ReadConcern.MAJORITY)
+		return client.getDatabase(DATABASE).withReadConcern(ReadConcern.MAJORITY)
 										   .getCollection(collectionName);
 	}
 	
