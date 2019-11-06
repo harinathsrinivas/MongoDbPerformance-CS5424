@@ -18,7 +18,8 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
 public class FileDriver {
-	
+	private static final String database = "wholesale2";
+
 	public static void main(String[] args) {
 		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 		Logger rootLogger = loggerContext.getLogger("org.mongodb.driver");
@@ -64,7 +65,6 @@ public class FileDriver {
 		}
 	}
 
-	private final String database = "wholesale";
 	private String connectionString;
 	private ReadConcern readConcern;
 	private WriteConcern writeConcern;
