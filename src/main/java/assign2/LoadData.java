@@ -3,6 +3,7 @@ package assign2;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.slf4j.LoggerFactory;
 
@@ -194,7 +195,8 @@ public class LoadData {
 			}
 			BasicDBObject cmd = new BasicDBObject("shardCollection", DATABASE + "." + collection).
 					  append("key", keys);
-			client.getDatabase("admin").runCommand((Bson) cmd);
+			Document result = client.getDatabase("admin").runCommand((Bson) cmd);
+			System.out.println(result.toJson());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
