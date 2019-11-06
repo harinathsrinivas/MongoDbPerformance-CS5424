@@ -25,7 +25,6 @@ public class LoadData {
 	private static final String HOST = "192.168.56.159";
 	private static final String NUM_WORKERS = "24";
 
-	
 	//private static final String DEFAULT_MONGOIMPORT_PATH = "/usr/local/bin/mongoimport";
 	//private static final String HOST = "localhost";
 	
@@ -77,8 +76,8 @@ public class LoadData {
 				                "W_STATE.string()", "W_ZIP.string()", "W_TAX.decimal()", "W_YTD.decimal()"};
 		String[] keys = {"W_ID"};
 		db.getCollection(name).createIndex(Indexes.ascending(keys), new IndexOptions().unique(true));
-		setShardKey(name, keys);
 		loadFromCsv(name, columnNames);
+		setShardKey(name, keys);
 	}
 	
 	public void loadDistrictData() {
@@ -87,8 +86,8 @@ public class LoadData {
 								"D_CITY.string()", "D_STATE.string()", "D_ZIP.string()", "D_TAX.decimal()", "D_YTD.decimal()", "D_NEXT_O_ID.int32()"};
 		String[] keys = {"D_W_ID", "D_ID"};
 		db.getCollection(name).createIndex(Indexes.ascending(keys), new IndexOptions().unique(true));
-		setShardKey(name, keys);
 		loadFromCsv(name, columnNames);
+		setShardKey(name, keys);
 	}
 	
 	public void loadCustomerData() {
@@ -101,8 +100,8 @@ public class LoadData {
 		String[] keys = {"C_W_ID", "C_D_ID", "C_ID"};
 		db.getCollection(name).createIndex(Indexes.ascending(keys), new IndexOptions().unique(true));
 		db.getCollection(name).createIndex(Indexes.descending("C_BALANCE"));
-		setShardKey(name, keys);
 		loadFromCsv(name, columnNames);
+		setShardKey(name, keys);
 	}
     
 	public void loadOrderData() {
@@ -111,10 +110,10 @@ public class LoadData {
 								"O_OL_CNT.int32()", "O_ALL_LOCAL.boolean()", "O_ENTRY_D.date(2006-01-02 15:04:05.999)"};
 		String[] keys = {"O_W_ID", "O_D_ID", "O_ID"};
 		db.getCollection(name).createIndex(Indexes.ascending(keys), new IndexOptions().unique(true));
-		//db.getCollection(name).createIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_CARRIER_ID"));
+		db.getCollection(name).createIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_CARRIER_ID"));
 		//db.getCollection(name).createIndex(Indexes.compoundIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_C_ID"), Indexes.descending("O_ID")));
-		setShardKey(name, keys);
 		loadFromCsv(name, columnNames, "-1");
+		setShardKey(name, keys);
 	}
 	
 	public void loadItemData() {
@@ -133,9 +132,9 @@ public class LoadData {
 								"OL_DIST_INFO.string()"};
 		String[] keys = {"OL_W_ID", "OL_D_ID", "OL_O_ID", "OL_NUMBER"};
 		db.getCollection(name).createIndex(Indexes.ascending(keys), new IndexOptions().unique(true));
-		//db.getCollection(name).createIndex(Indexes.ascending("OL_W_ID", "OL_I_ID"));
-		setShardKey(name, keys);
+		db.getCollection(name).createIndex(Indexes.ascending("OL_W_ID", "OL_I_ID"));
 		loadFromCsv("order-line", columnNames, "");
+		setShardKey(name, keys);
 	}
 
 	public void loadStockData() {
@@ -146,8 +145,8 @@ public class LoadData {
 								"S_DIST_08.string()", "S_DIST_09.string()", "S_DIST_10.string()", "S_DATA.string()"};
 		String[] keys = {"S_W_ID", "S_I_ID"};
 		db.getCollection(name).createIndex(Indexes.ascending(keys), new IndexOptions().unique(true));
-		setShardKey(name, keys);
 		loadFromCsv(name, columnNames);
+		setShardKey(name, keys);
 	}
 
 	private void loadFromCsv(String collectionName, String[] fieldNames) {
