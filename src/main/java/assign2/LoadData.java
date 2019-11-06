@@ -210,6 +210,7 @@ public class LoadData {
 			for (String field : fields) {
 				keys = keys.append(field, 1);
 			}
+			keys = new BasicDBObject("_id", "hashed");
 			BasicDBObject cmd = new BasicDBObject("shardCollection", DATABASE + "." + collection).
 					  append("key", keys);
 			Document result = client.getDatabase("admin").runCommand((Bson) cmd);
