@@ -23,6 +23,8 @@ public class LoadData {
 	private static final String DEFAULT_MONGOIMPORT_PATH = "/temp/MongoDb/mongo/mongos/mongodb-linux-x86_64-rhel70-4.2.1/bin/mongoimport";
 	private static final String DEFAULT_DATA_PATH = "project-files/data-files/";
 	private static final String HOST = "192.168.56.159";
+	private static final String NUM_WORKERS = "16";
+
 	
 	//private static final String DEFAULT_MONGOIMPORT_PATH = "/usr/local/bin/mongoimport";
 	//private static final String HOST = "localhost";
@@ -73,7 +75,9 @@ public class LoadData {
 		String name = "warehouse";
 		String[] columnNames = {"W_ID.int32()", "W_NAME.string()", "W_STREET_1.string()", "W_STREET_2.string()", "W_CITY.string()", 
 				                "W_STATE.string()", "W_ZIP.string()", "W_TAX.decimal()", "W_YTD.decimal()"};
-		db.getCollection(name).createIndex(Indexes.ascending("W_ID"), new IndexOptions().unique(true));
+		String[] keys = {"W_ID"};
+		db.getCollection(name).createIndex(Indexes.ascending(keys), new IndexOptions().unique(true));
+		setShardKey(name, keys);
 		loadFromCsv(name, columnNames);
 	}
 	
@@ -81,7 +85,9 @@ public class LoadData {
 		String name = "district";
 		String[] columnNames = {"D_W_ID.int32()", "D_ID.int32()", "D_NAME.string()", "D_STREET_1.string()", "D_STREET_2.string()", 
 								"D_CITY.string()", "D_STATE.string()", "D_ZIP.string()", "D_TAX.decimal()", "D_YTD.decimal()", "D_NEXT_O_ID.int32()"};
-		db.getCollection(name).createIndex(Indexes.ascending("D_W_ID", "D_ID"), new IndexOptions().unique(true));
+		String[] keys = {"D_W_ID", "D_ID"};
+		db.getCollection(name).createIndex(Indexes.ascending(keys), new IndexOptions().unique(true));
+		setShardKey(name, keys);
 		loadFromCsv(name, columnNames);
 	}
 	
@@ -169,7 +175,8 @@ public class LoadData {
 					          "--type", "csv", 
 					          "--fields", fields,
 					          "--columnsHaveTypes",
-					          "--ignoreBlanks"};
+					          "--ignoreBlanks",
+					          "--numInsertionWorkers", NUM_WORKERS};
 		String[] cmd = {"/bin/sh", "-c", sedCmd + " | " + String.join(" ", importCmd)};
 		executeCmd(cmd);
 	}
