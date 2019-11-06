@@ -19,7 +19,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 
 public class LoadData {
-	public static final String DATABASE = "wholesale";
+	public static final String DATABASE = "wholesale2";
 	private static final String DEFAULT_MONGOIMPORT_PATH = "/temp/MongoDb/mongo/mongos/mongodb-linux-x86_64-rhel70-4.2.1/bin/mongoimport";
 	private static final String DEFAULT_DATA_PATH = "project-files/data-files/";
 	private static final String HOST = "192.168.56.159";
