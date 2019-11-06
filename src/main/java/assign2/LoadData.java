@@ -23,7 +23,7 @@ public class LoadData {
 	private static final String DEFAULT_MONGOIMPORT_PATH = "/temp/MongoDb/mongo/mongos/mongodb-linux-x86_64-rhel70-4.2.1/bin/mongoimport";
 	private static final String DEFAULT_DATA_PATH = "project-files/data-files/";
 	private static final String HOST = "192.168.56.159";
-	private static final String NUM_WORKERS = "16";
+	private static final String NUM_WORKERS = "8";
 
 	
 	//private static final String DEFAULT_MONGOIMPORT_PATH = "/usr/local/bin/mongoimport";
@@ -160,26 +160,34 @@ public class LoadData {
 				        "--type", "csv", 
 				        "--file", filepath,
 				        "--fields", fields,
-				        "--columnsHaveTypes",
-				        "--numInsertionWorkers", NUM_WORKERS};
+				        "--numInsertionWorkers", NUM_WORKERS,
+				        "--columnsHaveTypes"};
 		executeCmd(cmd);
 	}
 	
 	private void loadFromCsv(String collectionName, String[] fieldNames, String replaceNull) {
 		String filepath = dataPath + collectionName + ".csv";
 		String sedCmd = "sed s/,null,/," + replaceNull + ",/ " + filepath;
+		String tmppath = "/tmp/mongotmp.csv";
+		String[] sed = {"/bin/sh", "-c", sedCmd + " > " + tmppath};
+		executeCmd(sed);
+		
 		String fields = "\"" + String.join(",", fieldNames) + "\"";
 		String[] importCmd = {mongoimportPath,
 							  "--host", HOST,
 					          "-d", DATABASE, 
 					          "-c", collectionName.replace("-", ""), 
 					          "--type", "csv", 
+					          "--file", tmppath,
 					          "--fields", fields,
+					          "--numInsertionWorkers", NUM_WORKERS,
 					          "--columnsHaveTypes",
-					          "--ignoreBlanks",
-					          "--numInsertionWorkers", NUM_WORKERS};
-		String[] cmd = {"/bin/sh", "-c", sedCmd + " | " + String.join(" ", importCmd)};
-		executeCmd(cmd);
+					          "--ignoreBlanks"};
+		//String[] cmd = {"/bin/sh", "-c", sedCmd + " | " + String.join(" ", importCmd)};
+		executeCmd(importCmd);
+		
+		String[] rm = {"/bin/rm", "-rf", tmppath};
+		executeCmd(rm);
 	}
 	
 	private void executeCmd(String[] cmd) {
@@ -202,7 +210,6 @@ public class LoadData {
 			for (String field : fields) {
 				keys = keys.append(field, 1);
 			}
-			keys = new BasicDBObject("_id", "hashed");
 			BasicDBObject cmd = new BasicDBObject("shardCollection", DATABASE + "." + collection).
 					  append("key", keys);
 			Document result = client.getDatabase("admin").runCommand((Bson) cmd);
