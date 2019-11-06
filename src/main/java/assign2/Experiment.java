@@ -19,11 +19,19 @@ public class Experiment {
 			"mongodb://192.168.56.163"};
 	
 	public static void main(String[] args) {
-		int nClients = Integer.parseInt(args[0]);
+		int nClients;
+		boolean test;
+		try {
+			nClients = Integer.parseInt(args[0]);
+			test = false;
+		} catch (Exception e) {
+			nClients = 1;
+			test = true;
+		}
 		String readConcern = args[1];
 		String writeConcern = args[2];
 		boolean reloadData = args.length == 3;
-		String xactFileDir = "project-files/xact-files";
+		String xactFileDir = test ? "test-file" : "project-files/xact-files";
 		String outputDir = String.format("experiment__nc_%d__r_%s__w_%s", 
 				nClients, readConcern, writeConcern);
 		Experiment exp = new Experiment(xactFileDir, outputDir, nClients, readConcern, writeConcern, reloadData);
