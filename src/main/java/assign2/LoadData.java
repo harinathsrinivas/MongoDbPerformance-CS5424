@@ -190,13 +190,13 @@ public class LoadData {
 		try {
 			BasicDBObject keys = new BasicDBObject();
 			for (String field : fields) {
-				keys = keys.append(field, new BasicDBObject(field, "hashed"));
+				keys = keys.append(field, new BasicDBObject(field, 1));
 			}
 			BasicDBObject cmd = new BasicDBObject("shardCollection", DATABASE + "." + collection).
 					  append("key", keys);
 			client.getDatabase("admin").runCommand((Bson) cmd);
 		} catch (Exception e) {
-			System.out.println("Skipping ShardKey");
+			e.printStackTrace();
 		}
 	}
 }
