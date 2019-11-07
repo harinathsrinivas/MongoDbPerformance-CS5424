@@ -130,11 +130,12 @@ public class LoadData {
 		String[] columnNames = {"OL_W_ID.int32()", "OL_D_ID.int32()", "OL_O_ID.int32()", "OL_NUMBER.int32()", "OL_I_ID.int32()", 
 								"OL_DELIVERY_D.date(2006-01-02 15:04:05.999)", "OL_AMOUNT.decimal()", "OL_SUPPLY_W_ID.int32()", "OL_QUANTITY.decimal()",
 								"OL_DIST_INFO.string()"};
-		String[] keys = {"OL_W_ID", "OL_D_ID", "OL_O_ID", "OL_NUMBER"};
-		db.getCollection(name).createIndex(Indexes.ascending(keys), new IndexOptions().unique(true));
+		String[] keys = {"OL_W_ID", "OL_D_ID"};
+		db.getCollection(name).createIndex(Indexes.ascending("OL_W_ID", "OL_D_ID", "OL_O_ID"));
+		db.getCollection(name).createIndex(Indexes.ascending("OL_W_ID", "OL_D_ID"));
 		db.getCollection(name).createIndex(Indexes.ascending("OL_W_ID", "OL_I_ID"));
 		loadFromCsv("order-line", columnNames, "");
-		setShardKey(name, keys);
+		setShardKey(name, keys, false);
 	}
 
 	public void loadStockData() {
@@ -203,7 +204,11 @@ public class LoadData {
 		} 
 	}
 	
-	private void setShardKey(String collection, String... fields) {
+	private void setShardKey(String collection, String[] fields) {
+		setShardKey(collection, fields, true);
+	}
+	
+	private void setShardKey(String collection, String[] fields, boolean unique) {
 		try {
 			BasicDBObject keys = new BasicDBObject();
 			for (String field : fields) {
