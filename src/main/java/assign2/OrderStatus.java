@@ -1,8 +1,5 @@
 package assign2;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.bson.Document;
 import org.bson.types.Decimal128;
 
@@ -10,7 +7,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.ReadConcern;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoIterable;
 
 import static com.mongodb.client.model.Filters.*;

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.bson.Document;
 
@@ -13,7 +11,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.ReadConcern;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoIterable;
 
 import static com.mongodb.client.model.Filters.*;
@@ -21,16 +18,6 @@ import static com.mongodb.client.model.Projections.*;
 
 
 public class StockLevel extends Transaction {
-	
-	public static void main(String[] args) {
-		Logger.getLogger("org.mongodb.driver").setLevel(Level.SEVERE);
-
-		MongoClient client = MongoClients.create();
-		StockLevel t = new StockLevel("wholesale", client, ReadConcern.LOCAL, WriteConcern.W1);
-		String[] args2 = {"O", "1", "1", "11", "20"};
-		t.process(args2);
-		client.close();
-	}
 	
 	public StockLevel(String database, MongoClient client, ReadConcern readConcern, WriteConcern writeConcern) {
 		super(database, client, readConcern, writeConcern);
