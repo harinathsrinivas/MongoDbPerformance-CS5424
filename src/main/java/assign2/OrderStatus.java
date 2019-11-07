@@ -17,16 +17,6 @@ import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
 
 public class OrderStatus extends Transaction {
-
-	public static void main(String[] args) {
-		Logger.getLogger("org.mongodb.driver").setLevel(Level.SEVERE);
-
-		MongoClient client = MongoClients.create();
-		OrderStatus t = new OrderStatus("wholesale", client, ReadConcern.LOCAL, WriteConcern.W1);
-		String[] args2 = {"O", "1", "1", "1234"};
-		t.process(args2);
-		client.close();
-	}
 	
 	public OrderStatus(String database, MongoClient client, ReadConcern readConcern, WriteConcern writeConcern) {
 		super(database, client, readConcern, writeConcern);
