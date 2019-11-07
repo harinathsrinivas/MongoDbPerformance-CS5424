@@ -113,7 +113,7 @@ public class LoadData {
 		String[] keys = {"O_W_ID", "O_D_ID", "O_ID"};
 		db.getCollection(name).createIndex(Indexes.ascending(keys), new IndexOptions().unique(true));
 		db.getCollection(name).createIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_CARRIER_ID"));
-		db.getCollection(name).createIndex(Indexes.compoundIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_C_ID")));
+		//db.getCollection(name).createIndex(Indexes.compoundIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_C_ID")));
 		loadFromCsv(name, columnNames, "-1");
 		setShardKey(name, keys);
 	}
