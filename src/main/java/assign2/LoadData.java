@@ -21,13 +21,13 @@ import ch.qos.logback.classic.LoggerContext;
 public class LoadData {
 	public static final String DATABASE = "wholesale";
 	private static final String DEFAULT_DATA_PATH = "project-files/data-files/";
-	//private static final String DEFAULT_MONGOIMPORT_PATH = "/temp/MongoDb/mongo/mongos/mongodb-linux-x86_64-rhel70-4.2.1/bin/mongoimport";
-	//private static final String HOST = "192.168.56.159";
-	//private static final String NUM_WORKERS = "24";
+	private static final String DEFAULT_MONGOIMPORT_PATH = "/temp/MongoDb/mongo/mongos/mongodb-linux-x86_64-rhel70-4.2.1/bin/mongoimport";
+	private static final String HOST = "192.168.56.159";
+	private static final String NUM_WORKERS = "24";
 
-	private static final String DEFAULT_MONGOIMPORT_PATH = "/usr/local/bin/mongoimport";
-	private static final String HOST = "localhost";
-	private static final String NUM_WORKERS = "4";
+	//private static final String DEFAULT_MONGOIMPORT_PATH = "/usr/local/bin/mongoimport";
+	//private static final String HOST = "localhost";
+	//private static final String NUM_WORKERS = "4";
 
 	
 	private String mongoimportPath;
