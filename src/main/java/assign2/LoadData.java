@@ -215,7 +215,7 @@ public class LoadData {
 				keys = keys.append(field, 1);
 			}
 			BasicDBObject cmd = new BasicDBObject("shardCollection", DATABASE + "." + collection).
-					  append("key", keys).append("unique", true);
+					  append("key", keys).append("unique", unique);
 			Document result = client.getDatabase("admin").runCommand((Bson) cmd);
 			System.out.println(result.toJson());
 		} catch (Exception e) {
