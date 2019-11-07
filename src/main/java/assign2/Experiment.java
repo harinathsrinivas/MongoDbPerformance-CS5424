@@ -39,8 +39,8 @@ public class Experiment {
 		String writeConcern = args[2];
 		boolean reloadData = args.length == 3;
 		String xactFileDir = test ? "test-file" : "project-files/xact-files";
-		String outputDir = String.format("experiment__nc_%d__r_%s__w_%s", 
-				nClients, readConcern, writeConcern);
+		String outputDir = test ? "experiment__test" :
+			String.format("experiment__nc_%d__r_%s__w_%s", nClients, readConcern, writeConcern);
 		Experiment exp = new Experiment(xactFileDir, outputDir, nClients, readConcern, writeConcern, reloadData);
 		exp.run();
 	}
