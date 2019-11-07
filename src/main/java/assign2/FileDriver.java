@@ -122,7 +122,7 @@ public class FileDriver {
 	private void outputTransactionStats(List<Long> transactionTimes) {
 		int n = transactionTimes.size();
 		long total = transactionTimes.stream().mapToLong(Long::longValue).sum();
-		double totalSec = (double) total / 100.0;
+		double totalSec = (double) total / 1000.0;
 		double throughput = (double) n / totalSec;
         double average = (double) total / (double) n;
 		double median = Quantiles.median().compute(transactionTimes);

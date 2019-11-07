@@ -1,13 +1,15 @@
 package assign2;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bson.Document;
-import org.bson.types.Decimal128;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.ReadConcern;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
@@ -25,7 +27,7 @@ public class StockLevel extends Transaction {
 
 		MongoClient client = MongoClients.create();
 		StockLevel t = new StockLevel("wholesale", client, ReadConcern.LOCAL, WriteConcern.W1);
-		String[] args2 = {"O", "1", "1", "20", "20"};
+		String[] args2 = {"O", "1", "1", "11", "20"};
 		t.process(args2);
 		client.close();
 	}
@@ -53,13 +55,7 @@ public class StockLevel extends Transaction {
 				items.add(i_id);
 		}
 		
-		int count = 0;
-		for (int i_id: items) {
-			Document stock = getStock(w_id, i_id);
-			if (stock.get("S_QUANTITY", Decimal128.class).intValue() < t) {
-				count++;
-			}
-		}
+		int count = countStock(w_id, items, t);
 		
 		System.out.printf(
 				"W_ID: %d\n" +
@@ -85,15 +81,17 @@ public class StockLevel extends Transaction {
 				.projection(fields(include("OL_I_ID"), excludeId()));
 		return cursor;
 	}
-	
-	private Document getStock(int w_id, int i_id) {
-		Document doc = getCollection("stock")
-				.find(and(eq("S_W_ID", w_id), eq("S_I_ID", i_id)))
-				.projection(fields(include("S_QUANTITY"), excludeId()))
-				.first();
+
+	private int countStock(int w_id, Set<Integer> items, int t) {
+		List<BasicDBObject> query = new ArrayList<BasicDBObject>();	
+		query.add(new BasicDBObject("$match", and(eq("S_W_ID", w_id), in("S_I_ID", items), lt("S_QUANTITY", t))));
+		BasicDBObject count = new BasicDBObject("_id", "").append("count", new BasicDBObject("$sum", 1));
+		query.add(new BasicDBObject("$group", count));
+		Document doc = getCollection("stock").aggregate(query).first();
 		if (doc == null) {
-			throw new IllegalArgumentException("No matching stock");
+			return 0;
 		}
-		return doc;
+		return doc.getInteger("count");
 	}
+
 }
