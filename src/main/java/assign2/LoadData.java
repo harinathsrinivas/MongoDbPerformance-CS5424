@@ -113,7 +113,7 @@ public class LoadData {
 		String[] keys = {"O_W_ID", "O_D_ID", "O_ID"};
 		db.getCollection(name).createIndex(Indexes.ascending(keys), new IndexOptions().unique(true));
 		db.getCollection(name).createIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_CARRIER_ID"));
-		//db.getCollection(name).createIndex(Indexes.compoundIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_C_ID")));
+		db.getCollection(name).createIndex(Indexes.compoundIndex(Indexes.ascending("O_W_ID", "O_D_ID", "O_C_ID")));
 		loadFromCsv(name, columnNames, "-1");
 		setShardKey(name, keys);
 	}
@@ -132,9 +132,8 @@ public class LoadData {
 		String[] columnNames = {"OL_W_ID.int32()", "OL_D_ID.int32()", "OL_O_ID.int32()", "OL_NUMBER.int32()", "OL_I_ID.int32()", 
 								"OL_DELIVERY_D.date(2006-01-02 15:04:05.999)", "OL_AMOUNT.decimal()", "OL_SUPPLY_W_ID.int32()", "OL_QUANTITY.decimal()",
 								"OL_DIST_INFO.string()"};
-		String[] keys = {"OL_W_ID", "OL_D_ID"};
+		String[] keys = {"OL_W_ID", "OL_D_ID", "OL_O_ID"};
 		db.getCollection(name).createIndex(Indexes.ascending("OL_W_ID", "OL_D_ID", "OL_O_ID"));
-		db.getCollection(name).createIndex(Indexes.ascending("OL_W_ID", "OL_D_ID"));
 		db.getCollection(name).createIndex(Indexes.ascending("OL_W_ID", "OL_I_ID"));
 		loadFromCsv("order-line", columnNames, "");
 		setShardKey(name, keys, false);
