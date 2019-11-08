@@ -47,7 +47,9 @@ public class Delivery extends Transaction {
 			updateOrderLines(w_id, d_id, o_id);
 			int c_id = order.getInteger("O_C_ID");
 			BigDecimal totalAmount = getTotalAmount(w_id, d_id, o_id);
-			updateCustomer(w_id, d_id, c_id, totalAmount);
+			if (totalAmount != null) {
+				updateCustomer(w_id, d_id, c_id, totalAmount);
+			}
 		}
 	}
 
@@ -67,6 +69,9 @@ public class Delivery extends Transaction {
 		BasicDBObject sums = new BasicDBObject("_id", "").append("TOTAL_OL_AMOUNT", new BasicDBObject("$sum", "$OL_AMOUNT"));
 		query.add(new BasicDBObject("$group", sums));
 		Document doc = getCollection("orderline").aggregate(query).first();
+		if (doc == null) {
+			return null;
+		}
 		return doc.get("TOTAL_OL_AMOUNT", Decimal128.class).bigDecimalValue();
 	}
 

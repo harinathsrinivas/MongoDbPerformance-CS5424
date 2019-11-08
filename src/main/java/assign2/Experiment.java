@@ -120,6 +120,7 @@ public class Experiment {
 			throughputs.add(getThroughput(path));
 		}
 		DoubleSummaryStatistics statistics = throughputs.stream().collect(Collectors.summarizingDouble(Double::doubleValue));
+		System.out.println("Writing Throughput stats");
 		try {
 			FileWriter  fileWriter = new FileWriter(throughputPath);
 		    PrintWriter printWriter = new PrintWriter(fileWriter);
@@ -132,7 +133,7 @@ public class Experiment {
 			System.out.println("Write Throughput failed.");
 			System.exit(0);
 		}
-
+		System.out.println("Finished Experiment");
 	}
 	
 	private void makeFolders() {

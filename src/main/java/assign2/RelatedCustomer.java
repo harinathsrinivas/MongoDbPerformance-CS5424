@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.bson.Document;
 
@@ -14,24 +12,13 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.ReadConcern;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoIterable;
 
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
 
 public class RelatedCustomer extends Transaction {
-	
-	public static void main(String[] args) {
-		Logger.getLogger("org.mongodb.driver").setLevel(Level.SEVERE);
 
-		MongoClient client = MongoClients.create();
-		RelatedCustomer t = new RelatedCustomer("wholesale", client, ReadConcern.LOCAL, WriteConcern.W1);
-		String[] args2 = {"O", "5", "1", "393"};
-		t.process(args2);
-		client.close();
-	}
-	
 	private static int THRESHOLD = 2;
 
 	public RelatedCustomer(String database, MongoClient client, ReadConcern readConcern, WriteConcern writeConcern) {

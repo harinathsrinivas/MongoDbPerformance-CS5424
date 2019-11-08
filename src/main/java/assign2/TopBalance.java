@@ -7,26 +7,12 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.ReadConcern;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoIterable;
 
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class TopBalance extends Transaction {
-	
-	public static void main(String[] args) {
-		Logger.getLogger("org.mongodb.driver").setLevel(Level.SEVERE);
-
-		MongoClient client = MongoClients.create();
-		TopBalance t = new TopBalance("wholesale", client, ReadConcern.LOCAL, WriteConcern.W1);
-		String[] args2 = {"O"};
-		t.process(args2);
-		client.close();
-	}
 
 	public TopBalance(String database, MongoClient client, ReadConcern readConcern, WriteConcern writeConcern) {
 		super(database, client, readConcern, writeConcern);
