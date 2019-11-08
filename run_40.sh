@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in 40
+for i in 10 20
 do
     for j in majority,majority 1,3; 
     do 
