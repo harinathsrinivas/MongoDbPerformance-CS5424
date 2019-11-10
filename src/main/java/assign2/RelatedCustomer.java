@@ -20,21 +20,6 @@ import static com.mongodb.client.model.Projections.*;
 
 public class RelatedCustomer extends Transaction {
 
-	public static void main(String[] args) {
-		System.out.println(findExecutable("mongoimport"));
-	}
-	
-	public static String findExecutable(String name) {
-	    for (String dirname : System.getenv("PATH").split(File.pathSeparator)) {
-	        File file = new File(dirname, name);
-	        System.out.println(file.getAbsolutePath());
-	        if (file.isFile() && file.canExecute()) {
-	            return file.getAbsolutePath();
-	        }
-	    }
-	    throw new Error("Cannot find " + name);
-	}
-	
 	private static int THRESHOLD = 2;
 
 	public RelatedCustomer(String database, MongoClient client, ReadConcern readConcern, WriteConcern writeConcern) {

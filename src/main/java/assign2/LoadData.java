@@ -24,10 +24,6 @@ public class LoadData {
 	private static final String DEFAULT_DATA_PATH = "project-files/data-files/";
 	private static final String HOST = "192.168.56.159";
 	private static final String NUM_WORKERS = "24";
-
-	//private static final String HOST = "localhost";
-	//private static final String NUM_WORKERS = "4";
-
 	
 	private String mongoimportPath;
 	private String dataPath;
