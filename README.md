@@ -233,9 +233,10 @@ Copy the project-files into this directory
 ```
 cp -R <project-files path> ./project-files
 ```
-Build the maven package
+
+(Optional) Rebuild the maven package. Optional as the project files combines with the built binaries.
 ```
-sh build.sh
+mvn clean dependency:copy-dependencies package
 ```
 
 ### 6. Run Experiments
