@@ -23,8 +23,6 @@ tar xzvf apache-maven-3.3.9-bin.tar.gz
 ```
 ### 3. SET ENVIRONMENT VARIABLES
 ```
-export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-1.el7_7.x86_64
-export PATH=$JAVA_HOME/bin:$PATH
 export PATH=/temp/newMongo/mongodb-linux-x86_64-rhel70-4.2.1/bin:$PATH
 ```
 
@@ -225,21 +223,43 @@ sh.addShard("shard5/192.168.56.159:27025,192.168.56.162:27025,192.168.56.163:270
 sh.status()
 ```
 
-### 5. Load data
-Before running the scripts, make sure the project folder is uploaded into the home folder. Change directory to the project folder to prepare for benchmarking.
+### 5. Prepare directory
+Before running the scripts, make sure the project folder is uploaded into the home folder. 
+Change directory to the project folder to prepare for benchmarking.
 ```
 cd MongoDbPerformance-CS5424
 ```
+Copy the project-files into this directory
+```
+cp -R <project-files path> ./project-files
+```
+Build the maven package
+```
+sh build.sh
+```
 
-### 6. Run transactions
+### 6. Run Experiments
+To run an experiment
+```
+java -cp target/*:target/dependency/*:. assign2.Experiment <NC> <read_concern> <write_concern>
+```
+<NC> is an integer for the number of clients
+<read_concern> is either 'majority' or 1 (for local)
+<write_concern> is either 'majority' or 1 or 3
+
+It would first load (or reload) the data, then spawn NC clients as processes.
+
+To run for all experiments sequentially
+```
+sh run_all_experiments.sh
+```
 
 ### 7. Evaluate performance
 
-### 8. Run statistics
-go to reports directory and execute the following to get performance statistics and sorted results. Based on the NC, give the argument for the python file execution
-```
-cd experiment__nc_20__r_majority__w_majority/report/
-cp -rpf $project/statistics.py .
-python statistics.py 20
-```
+After running the experiment/s:
 
+The transaction logs are stored in ./experiment__nc_<NC>__r_<read_concern>__w_<write_concern>/xact-output/<i>-output.txt
+The client performance report is scored in ./experiment__nc_ <NC>__r_<read_concern>__w_<write concern>/report/<i>-report.txt
+After all transactions are completed:
+ - the throughput statistics across clients are calculated and stored in ./experiment__nc_<NC>__r_<read_concern>__w_<write_concern>/report/throughput-report.txt.
+ - the data base state is calculated and stored in ./experiment__nc_<NC>__r_<read_concern>__w_<write_concern>/report/state-report.txt.
